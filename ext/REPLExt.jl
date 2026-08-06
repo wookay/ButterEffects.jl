@@ -417,7 +417,9 @@ function repl_effectbits(io::Base.TTY, line::AbstractString)::Bool
     return false
 end
 
-import REPL: _helpmode
+using REPL: REPL
+using .REPL: extended_help_on, keywords, isexpr
+import .REPL: _helpmode
 # from julia/stdlib/REPL/src/docview.jl
 # function _helpmode(io::IO, line::AbstractString, mod::Module=Main, internal_accesses::Union{Nothing, Set{Pair{Module,Symbol}}}=nothing)
 function _helpmode(io::Base.TTY, line::AbstractString, mod::Module=Main, internal_accesses::Union{Nothing, Set{Pair{Module,Symbol}}}=nothing)

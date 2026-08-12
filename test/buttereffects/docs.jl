@@ -8,7 +8,7 @@ using .Docs: PartitionKind
 letter = EffectBitsLetter("?u")
 @test effectbitsletter_color(letter) === :yellow
 
-kind = PartitionKind(Base.PARTITION_KIND_CONST)
-@test kind.value == Base.PARTITION_KIND_CONST
+part = PartitionKind(Base.PARTITION_KIND_CONST)
+@test part.kind == Base.PARTITION_KIND_CONST
 
 end # module test_buttereffects_docs

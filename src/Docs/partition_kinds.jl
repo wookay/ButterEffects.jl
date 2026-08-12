@@ -17,7 +17,7 @@ const PARTITION_KIND_BACKDATED_CONST    = 0xb
 =#
 
 struct PartitionKind
-    value::UInt8
+    kind::UInt8
 end
 
 const partition_kinds = [
@@ -35,16 +35,66 @@ const partition_kinds = [
     :PARTITION_KIND_BACKDATED_CONST,
 ]
 
-function Base.show(io::IO, mime::MIME"text/plain", kind::PartitionKind)
-    for value in Base.PARTITION_KIND_CONST:Base.PARTITION_KIND_BACKDATED_CONST
-        kind_sym = partition_kinds[value+1]
-        if value == kind.value
-            printstyled(io, "const ", kind_sym, " = ", repr(value); color = :cyan)
+function Base.show(io::IO, mime::MIME"text/plain", part::PartitionKind)
+    for kind in Base.PARTITION_KIND_CONST:Base.PARTITION_KIND_BACKDATED_CONST
+        kind_sym = partition_kinds[kind+1]
+        if kind == part.kind
+            printstyled(io, "const ", kind_sym, " = ", repr(kind); color = :cyan)
         else
-            print(io,       "const ", kind_sym, " = ", repr(value))
+            print(io,       "const ", kind_sym, " = ", repr(kind))
         end
         println(io)
     end
 end
+
+
+"""
+```julia
+(kind == PARTITION_KIND_CONST || kind == PARTITION_KIND_CONST_IMPORT || kind == PARTITION_KIND_IMPLICIT_CONST || kind == PARTITION_KIND_BACKDATED_CONST)
+```
+"""
+Base.is_defined_const_binding(kind::UInt8)
+
+"""
+```julia
+(is_defined_const_binding(kind) || kind == PARTITION_KIND_UNDEF_CONST)
+```
+"""
+Base.is_some_const_binding(kind::UInt8)
+
+"""
+```julia
+(kind == PARTITION_KIND_IMPLICIT_GLOBAL || kind == PARTITION_KIND_IMPLICIT_CONST || kind == PARTITION_KIND_EXPLICIT || kind == PARTITION_KIND_IMPORTED)
+```
+"""
+Base.is_some_imported(kind::UInt8)
+
+"""
+```julia
+(kind == PARTITION_KIND_IMPLICIT_GLOBAL || kind == PARTITION_KIND_IMPLICIT_CONST || kind == PARTITION_KIND_GUARD || kind == PARTITION_KIND_FAILED)
+```
+"""
+Base.is_some_implicit(kind::UInt8)
+
+"""
+```julia
+(kind == PARTITION_KIND_EXPLICIT || kind == PARTITION_KIND_IMPORTED)
+```
+"""
+Base.is_some_explicit_imported(kind::UInt8)
+
+"""
+```julia
+is_some_explicit_imported(kind) || kind == PARTITION_KIND_IMPLICIT_GLOBAL
+```
+"""
+Base.is_some_binding_imported(kind::UInt8)
+
+"""
+```julia
+(kind == PARTITION_KIND_GUARD || kind == PARTITION_KIND_FAILED || kind == PARTITION_KIND_UNDEF_CONST)
+```
+"""
+Base.is_some_guard(kind::UInt8)
 
 # module ButterEffects.Docs

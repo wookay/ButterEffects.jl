@@ -418,20 +418,26 @@ function repl_effectbits(io::Base.TTY, line::AbstractString)::Bool
 end
 
 function repl_partition_kinds(io::Base.TTY, line::AbstractString)::Bool
+    local kind
     if startswith(line, "Base.PARTITION_KIND_")
-        value = eval(Meta.parse(line))
-        kind = Docs.PartitionKind(value)
-        mime = MIME"text/plain"()
-        Base.show(io, mime, kind)
-        return true
+        try
+            kind = eval(Meta.parse(line))
+        catch ex # ::UndefVarError
+            return false
+        end
     elseif startswith(line, "PARTITION_KIND_")
-        value = eval(Meta.parse(string("Base.", line)))
-        kind = Docs.PartitionKind(value)
-        mime = MIME"text/plain"()
-        Base.show(io, mime, kind)
-        return true
+        try
+            kind = eval(Meta.parse(string("Base.", line)))
+        catch ex # ::UndefVarError
+            return false
+        end
+    else
+        return false
     end
-    return false
+    part = Docs.PartitionKind(kind)
+    mime = MIME"text/plain"()
+    Base.show(io, mime, part)
+    return true
 end
 
 using HelpMode

@@ -417,9 +417,27 @@ function repl_effectbits(io::Base.TTY, line::AbstractString)::Bool
     return false
 end
 
+function repl_partition_kinds(io::Base.TTY, line::AbstractString)::Bool
+    if startswith(line, "Base.PARTITION_KIND_")
+        value = eval(Meta.parse(line))
+        kind = Docs.PartitionKind(value)
+        mime = MIME"text/plain"()
+        Base.show(io, mime, kind)
+        return true
+    elseif startswith(line, "PARTITION_KIND_")
+        value = eval(Meta.parse(string("Base.", line)))
+        kind = Docs.PartitionKind(value)
+        mime = MIME"text/plain"()
+        Base.show(io, mime, kind)
+        return true
+    end
+    return false
+end
+
 using HelpMode
 function __init__()
     HelpMode.register(repl_effectbits)
+    HelpMode.register(repl_partition_kinds)
 end
 
 end # module REPLExt

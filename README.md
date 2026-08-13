@@ -20,7 +20,7 @@ help?> :noub
 
   – doc from julia/base/expr.jl macro assume_effects(args...)
 
-help?> Base.PARTITION_KIND_IMPORTED
+help?> PARTITION_KIND_IMPORTED
 const PARTITION_KIND_CONST = 0x00
 const PARTITION_KIND_CONST_IMPORT = 0x01
 const PARTITION_KIND_GLOBAL = 0x02
@@ -33,6 +33,10 @@ const PARTITION_KIND_DECLARED = 0x08
 const PARTITION_KIND_GUARD = 0x09
 const PARTITION_KIND_UNDEF_CONST = 0x0a
 const PARTITION_KIND_BACKDATED_CONST = 0x0b
+
+  // Imported: The binding was explicitly import'd by name // ->restriction holds the imported binding
+
+  – doc from julia/src/julia.h
 
 help?> Base.is_some_const_binding
   │ Warning

@@ -27,7 +27,7 @@ const PARTITION_KIND_GLOBAL = 0x02
 const PARTITION_KIND_IMPLICIT_GLOBAL = 0x03
 const PARTITION_KIND_IMPLICIT_CONST = 0x04
 const PARTITION_KIND_EXPLICIT = 0x05
-const PARTITION_KIND_IMPORTED = 0x06
+const PARTITION_KIND_IMPORTED = 0x06  <===
 const PARTITION_KIND_FAILED = 0x07
 const PARTITION_KIND_DECLARED = 0x08
 const PARTITION_KIND_GUARD = 0x09
@@ -44,6 +44,11 @@ help?> Base.is_some_const_binding
 
   (is_defined_const_binding(kind) || kind == PARTITION_KIND_UNDEF_CONST)
 ```
+
+### repositories
+ - ButterEffects 🧈  https://github.com/wookay/ButterEffects.jl
+ - EnvironmentVariables 🔡  https://github.com/wookay/EnvironmentVariables.jl
+
 
 [actions-img]: https://github.com/wookay/ButterEffects.jl/workflows/CI/badge.svg
 [actions-url]: https://github.com/wookay/ButterEffects.jl/actions

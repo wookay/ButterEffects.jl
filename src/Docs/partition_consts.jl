@@ -20,15 +20,13 @@ using Base: PARTITION_KIND_CONST, #
             PARTITION_MASK_KIND, #
             PARTITION_MASK_FLAG
 
-if isdefined(Base, :PARTITION_FLAG_IMPLICITLY_EXPORTED)
-using Base: PARTITION_FLAG_IMPLICITLY_EXPORTED
-else
-const PARTITION_FLAG_IMPLICITLY_EXPORTED = 0x80
-end
-if isdefined(Base, :PARTITION_FLAG_IMPLICITLY_DEPRECATED)
-using Base: PARTITION_FLAG_IMPLICITLY_DEPRECATED
-else
-const PARTITION_FLAG_IMPLICITLY_DEPRECATED = 0x100
+for (name, value) in [(:PARTITION_FLAG_IMPLICITLY_EXPORTED, 0x80),
+                      (:PARTITION_FLAG_IMPLICITLY_DEPRECATED, 0x100)]
+    if isdefinedglobal(Base, name)
+        @eval using Base: $name
+    else
+        @eval const $name = $value
+    end
 end
 
 # from julia/base/runtime_internals.jl
@@ -248,11 +246,11 @@ function Base.show(io::IO, mime::MIME"text/plain", part::PartitionKind)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", part::PartitionFlag)
-    for (idx, flag) in enumerate((PARTITION_FLAG_EXPORTED,
+    for (idx, flag) in enumerate([PARTITION_FLAG_EXPORTED,
                                   PARTITION_FLAG_DEPRECATED,
                                   PARTITION_FLAG_DEPWARN,
                                   PARTITION_FLAG_IMPLICITLY_EXPORTED,
-                                  PARTITION_FLAG_IMPLICITLY_DEPRECATED))
+                                  PARTITION_FLAG_IMPLICITLY_DEPRECATED])
         flag_sym = partition_flags[idx]
         if flag == part.flag
             printstyled(io, "const ", flag_sym, " = ", repr(flag); color = :cyan)
@@ -264,8 +262,8 @@ function Base.show(io::IO, mime::MIME"text/plain", part::PartitionFlag)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", part::PartitionMask)
-    for (idx, mask) in enumerate((PARTITION_MASK_KIND,
-                                  PARTITION_MASK_FLAG))
+    for (idx, mask) in enumerate([PARTITION_MASK_KIND,
+                                  PARTITION_MASK_FLAG])
         mask_sym = partition_masks[idx]
         if mask == part.mask
             printstyled(io, "const ", mask_sym, " = ", repr(mask); color = :cyan)

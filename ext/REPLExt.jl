@@ -2,8 +2,8 @@ module REPLExt
 
 using ButterEffects: Docs
 
-function repl_effectbits(io::Base.TTY, line::AbstractString)::Bool
-     mime = MIME"text/plain"()
+function repl_effectbits(io::IO, line::AbstractString)::Bool
+    mime = MIME("text/plain")
     if line ∈ Docs.effectbits_letters
         letter = Docs.EffectBitsLetter(String(line))
         Docs.show_effectbits_letter(io, mime, letter)
@@ -32,33 +32,42 @@ function repl_effectbits(io::Base.TTY, line::AbstractString)::Bool
     return false
 end # function repl_effectbits
 
-function repl_partition_kinds(io::Base.TTY, line::AbstractString)::Bool
-    local kind
-    if startswith(line, "Base.PARTITION_KIND_")
-        try
-            kind = eval(Meta.parse(line))
-        catch ex # ::UndefVarError
-            return false
-        end
-    elseif startswith(line, "PARTITION_KIND_")
-        try
-            kind = eval(Meta.parse(string("Base.", line)))
-        catch ex # ::UndefVarError
-            return false
-        end
+function repl_partition_consts(io::IO, line::AbstractString)::Bool
+    local name
+    if startswith(line, "Base.PARTITION_")
+        name = line[6:end]
+    elseif startswith(line, "PARTITION_")
+        name = line
     else
         return false
     end
-    part = Docs.PartitionKind(kind)
-    mime = MIME"text/plain"()
-    Base.show(io, mime, part)
-    return true
-end # function repl_partition_kinds
+    local n
+    try
+        n = getglobal(Docs, Symbol(name))
+    catch ex # ::UndefVarError
+        return false
+    end
+    mime = MIME("text/plain")
+    if startswith(name, "PARTITION_KIND_")
+        part = Docs.PartitionKind(n)
+        Base.show(io, mime, part)
+        return true
+    elseif startswith(name, "PARTITION_FLAG_")
+        part = Docs.PartitionFlag(n)
+        Base.show(io, mime, part)
+        return true
+    elseif startswith(name, "PARTITION_MASK_")
+        part = Docs.PartitionMask(n)
+        Base.show(io, mime, part)
+        return true
+    end
+    return false
+end # function repl_partition_consts
 
 using HelpMode
 function __init__()
     HelpMode.register(repl_effectbits)
-    HelpMode.register(repl_partition_kinds)
+    HelpMode.register(repl_partition_consts)
 end
 
 end # module REPLExt

@@ -34,7 +34,10 @@ const PARTITION_KIND_GUARD = 0x09
 const PARTITION_KIND_UNDEF_CONST = 0x0a
 const PARTITION_KIND_BACKDATED_CONST = 0x0b
 
-  // Imported: The binding was explicitly import'd by name // ->restriction holds the imported binding
+explicit `import` from partition restriction globalref
+
+  // Imported: The binding was explicitly import'd by name // ->restriction holds the
+  imported binding
 
   – doc from julia/src/julia.h
 

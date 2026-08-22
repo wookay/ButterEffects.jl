@@ -462,7 +462,7 @@ function show_effectbits_suffix(io::IO, mime::MIME"text/plain", suffix::Union{Ch
   `Core.Compiler.return_type`."""
     end
     setting = getindex(Docs.effectbits_suffix_consts, suffix)
-    repl_effectsetting(io, setting)
+    show_effectsetting(io, mime, setting)
     println(io)
     println(io)
     doc_from = "-- doc from julia/Compiler/src/effects.jl    `struct Effects`"

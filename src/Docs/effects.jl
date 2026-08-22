@@ -6,6 +6,7 @@
 const effectsettings = [
     :consistent,
     :effect_free,
+    :reset_safe,
     :nothrow,
     :terminates_globally,
     :terminates_locally,
@@ -13,21 +14,22 @@ const effectsettings = [
     :inaccessiblememonly,
     :noub,
     :noub_if_noinbounds,
+    :nonoverlayed,
+    :consistent_overlay,
     :nortcall,
-    :reset_safe,
     :foldable,
     :removable,
     :total
 ]
 
 const effectbits_const_to_suffix = Dict{String, Union{Char, String}}(
-    "CONSISTENT_IF_NOTRETURNED" => 'c',
-    "CONSISTENT_IF_INACCESSIBLEMEMONLY" => 'c',
+    "CONSISTENT_IF_NOTRETURNED"          => 'c',
+    "CONSISTENT_IF_INACCESSIBLEMEMONLY"  => 'c',
     "EFFECT_FREE_IF_INACCESSIBLEMEMONLY" => 'e',
-    "RESET_SAFE_IF_INACCESSIBLEMEMONLY" => "re",
-    "INACCESSIBLEMEM_OR_ARGMEMONLY" => 'm',
-    "NOUB_IF_NOINBOUNDS" => 'u',
-    "CONSISTENT_OVERLAY" => 'o',
+    "RESET_SAFE_IF_INACCESSIBLEMEMONLY"  => "re",
+    "INACCESSIBLEMEM_OR_ARGMEMONLY"      => 'm',
+    "NOUB_IF_NOINBOUNDS"                 => 'u',
+    "CONSISTENT_OVERLAY"                 => 'o',
 )
 
 const effectbits_letters = [
@@ -48,16 +50,16 @@ const effectbits_suffixes = [
 ]
 
 const effectbits_suffix_consts = Dict{Union{Char, String}, Symbol}(
-    'c' => :consistent,
-    'e' => :effect_free,
+    'c'  => :consistent,
+    'e'  => :effect_free,
     "re" => :reset_safe,
-    'n' => :nothrow,
-    't' => :terminates,
-    's' => :notaskstate,
-    'm' => :inaccessiblememonly,
-    'u' => :noub,
-    'o' => :nonoverlayed,
-    'r' => :nortcall
+    'n'  => :nothrow,
+    't'  => :terminates,
+    's'  => :notaskstate,
+    'm'  => :inaccessiblememonly,
+    'u'  => :noub,
+    'o'  => :nonoverlayed,
+    'r'  => :nortcall
 )
 
 struct EffectBitsLetter
@@ -78,7 +80,7 @@ struct EffectBitsLetter
 end
 
 function effectbitsletter_color(letter::EffectBitsLetter)
-    if letter.prefix == '+'
+    if letter.prefix     == '+'
         return :green
     elseif letter.prefix == '-'
         return :red
@@ -94,6 +96,8 @@ function Base.show(io::IO, mime::MIME"text/plain", letter::EffectBitsLetter)
     printstyled(io, string(letter.prefix, letter.suffix); color)
 end
 
+
+const _setting_doc_from_struct_effects = (:noub_if_noinbounds, :nonoverlayed, :consistent_overlay)
 
 # doc from julia/base/expr.jl    `macro assume_effects(args...)`
 #          julia/Compiler/src/effects.jl    `struct Effects`"
@@ -167,6 +171,25 @@ were not executed.
     The `:effect_free` assertion is made both for the method itself and any code
     that is executed by the method. Keep in mind that the assertion must be
     valid for all world ages and limit use of this assertion accordingly."""
+    elseif setting === :reset_safe
+        """
+## `:reset_safe`
+
+The `:reset_safe` asserts that it is safe to abandon execution of the annotated
+function at any point. For functions so inferred, the compiler may extend the
+reset region of a cancellation point through the `:reset_safe` regions. It thus
+in particular implies `:effect_free`, but is a stronger assertion. For example,
+an `:effect_free` function could in principle take a read-only lock (under appropriate
+assumptions on how this is implemented and annotated), but a `:reset_safe` function
+may not, because it could be abandoned inside the critical section.
+
+The same also applies to many implicitly inserted intrinsics and thus codegen for
+a `:reset_safe` function requires cooperation by the code generator to uphold the
+invariant throughout the entire body of the generated code.
+
+As such, annotating a function as `:reset_safe` is currently ignored as an effect
+override and will only apply to [`@ccall`](@ref) sites. See the ccall documentation
+for further details on this interaction."""
     elseif setting === :nothrow
         """
 ## `:nothrow`
@@ -275,6 +298,24 @@ not model this, and they assume the absence of undefined behavior."""
   Note that undefined behavior may technically cause the method to violate any other effect
   assertions (such as `:consistent` or `:effect_free`) as well, but we do not model this,
   and they assume the absence of undefined behavior."""
+    elseif setting === :nonoverlayed
+        """
+- `nonoverlayed::UInt8`:
+  * `ALWAYS_TRUE`: this method is guaranteed to not invoke any methods that are defined in an
+    [overlayed method table](@ref OverlayMethodTable).
+  * `CONSISTENT_OVERLAY`: this method may invoke overlayed methods, but all such overlayed
+    methods are `:consistent` with their non-overlayed original counterparts
+    (see [`Base.@assume_effects`](@ref) for the exact definition of `:consistent`-cy).
+  * `ALWAYS_FALSE`: this method may invoke overlayed methods."""
+    elseif setting === :consistent_overlay
+        """
+- `nonoverlayed::UInt8`:
+  * `ALWAYS_TRUE`: this method is guaranteed to not invoke any methods that are defined in an
+    [overlayed method table](@ref OverlayMethodTable).
+  * `CONSISTENT_OVERLAY`: this method may invoke overlayed methods, but all such overlayed
+    methods are `:consistent` with their non-overlayed original counterparts
+    (see [`Base.@assume_effects`](@ref) for the exact definition of `:consistent`-cy).
+  * `ALWAYS_FALSE`: this method may invoke overlayed methods."""
     elseif setting === :nortcall
         """
 ## `:nortcall`
@@ -289,25 +330,6 @@ and that any other methods this method might call also do not call `Core.Compile
     whether the result of `Core.Compiler.return_type` is folded at compile time depends
     heavily on the compiler's implementation, it is generally risky to assert this if
     the method in question uses `Core.Compiler.return_type` in any form."""
-    elseif setting === :reset_safe
-        """
-## `:reset_safe`
-
-The `:reset_safe` asserts that it is safe to abandon execution of the annotated
-function at any point. For functions so inferred, the compiler may extend the
-reset region of a cancellation point through the `:reset_safe` regions. It thus
-in particular implies `:effect_free`, but is a stronger assertion. For example,
-an `:effect_free` function could in principle take a read-only lock (under appropriate
-assumptions on how this is implemented and annotated), but a `:reset_safe` function
-may not, because it could be abandoned inside the critical section.
-
-The same also applies to many implicitly inserted intrinsics and thus codegen for
-a `:reset_safe` function requires cooperation by the code generator to uphold the
-invariant throughout the entire body of the generated code.
-
-As such, annotating a function as `:reset_safe` is currently ignored as an effect
-override and will only apply to [`@ccall`](@ref) sites. See the ccall documentation
-for further details on this interaction."""
     elseif setting === :foldable
         """
 ## `:foldable`
@@ -364,7 +386,7 @@ the following other `setting`s:
     number of effect overrides apply to a set of functions, a custom macro is
     recommended over the use of `:total`."""
     end
-    if setting === :noub_if_noinbounds
+    if setting ∈ _setting_doc_from_struct_effects
         doc_from = "-- doc from julia/Compiler/src/effects.jl    `struct Effects`"
     else
         doc_from = "-- doc from julia/base/expr.jl    `macro assume_effects(args...)`"
@@ -462,9 +484,11 @@ function show_effectbits_suffix(io::IO, mime::MIME"text/plain", suffix::Union{Ch
   `Core.Compiler.return_type`."""
     end
     setting = getindex(Docs.effectbits_suffix_consts, suffix)
-    show_effectsetting(io, mime, setting)
-    println(io)
-    println(io)
+    if setting ∉ _setting_doc_from_struct_effects
+        show_effectsetting(io, mime, setting)
+        println(io)
+        println(io)
+    end
     doc_from = "-- doc from julia/Compiler/src/effects.jl    `struct Effects`"
     md = Markdown.MD(Any[Markdown.parse(doc), Markdown.parse(doc_from)])
     Base.show(io, mime, md)

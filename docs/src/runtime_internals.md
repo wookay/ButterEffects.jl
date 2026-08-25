@@ -1,0 +1,9 @@
+```@docs
+Base.is_some_binding_imported
+Base.is_defined_const_binding
+Base.is_some_imported
+Base.is_some_const_binding
+Base.is_some_implicit
+Base.is_some_guard
+Base.is_some_explicit_imported
+```

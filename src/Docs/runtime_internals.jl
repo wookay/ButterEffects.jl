@@ -1,5 +1,7 @@
 # module ButterEffects.Docs
 
+# from julia/base/runtime_internals.jl
+
 """
 ```julia
 (kind == PARTITION_KIND_CONST || kind == PARTITION_KIND_CONST_IMPORT || kind == PARTITION_KIND_IMPLICIT_CONST || kind == PARTITION_KIND_BACKDATED_CONST)

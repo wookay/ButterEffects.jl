@@ -1,0 +1,16 @@
+```@docs
+Base.@_total_meta
+Base.@_terminates_globally_meta
+Base.@_terminates_globally_noub_meta
+Base.@_foldable_meta
+Base.@_nothrow_noub_meta
+Base.@_terminates_locally_meta
+Base.@_terminates_globally_notaskstate_meta
+Base.@_nospecializeinfer_meta
+Base.@_nothrow_meta
+Base.@_effect_free_terminates_locally_meta
+Base.@_noub_if_noinbounds_meta
+Base.@_propagate_inbounds_meta
+Base.@_noub_meta
+Base.@_notaskstate_meta
+```

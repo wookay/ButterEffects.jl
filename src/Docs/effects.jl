@@ -101,7 +101,7 @@ const _setting_doc_from_struct_effects = (:noub_if_noinbounds, :nonoverlayed, :c
 
 # doc from julia/base/expr.jl    `macro assume_effects(args...)`
 #          julia/Compiler/src/effects.jl    `struct Effects`"
-function show_effectsetting(io::IO, mime::MIME"text/plain", setting::Symbol)
+function contents_for_effectsetting(setting::Symbol)
     doc = if setting === :consistent
         """
 ## `:consistent`
@@ -391,8 +391,12 @@ the following other `setting`s:
     else
         doc_from = "-- doc from julia/base/expr.jl    `macro assume_effects(args...)`"
     end
-    md = Markdown.MD(Any[Markdown.parse(doc), Markdown.parse(doc_from)])
-    Base.show(io, mime, md)
+    string(doc, doc_from)
+end # function contents_for_effectsetting
+
+function show_effectsetting(io::IO, mime::MIME"text/plain", setting::Symbol)
+    content = contents_for_effectsetting(setting)
+    Base.show(io, mime, Markdown.MD(content))
 end # function show_effectsetting
 
 # doc from julia/Compiler/src/effects.jl

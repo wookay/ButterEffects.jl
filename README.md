@@ -1,9 +1,9 @@
 # ButterEffects.jl 🧈
 
-|  **Build Status**                |
-|:---------------------------------|
-|  [![][actions-img]][actions-url] |
 
+|  **Documentation**                        |  **Build Status**                 |
+|:-----------------------------------------:|:---------------------------------:|
+|  [![][docs-latest-img]][docs-latest-url]  |  [![][actions-img]][actions-url]  |
 
 ```julia-repl
 julia> using ButterEffects
@@ -69,6 +69,9 @@ help?> Base.is_some_const_binding
  - ButterEffects 🧈  https://github.com/wookay/ButterEffects.jl
  - EnvironmentVariables 🔡  https://github.com/wookay/EnvironmentVariables.jl
 
+
+[docs-latest-img]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-latest-url]: https://wookay.github.io/docs/ButterEffects.jl/
 
 [actions-img]: https://github.com/wookay/ButterEffects.jl/workflows/CI/badge.svg
 [actions-url]: https://github.com/wookay/ButterEffects.jl/actions

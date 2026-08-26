@@ -10,16 +10,16 @@ help?> +c
 
 ## effectbits letters
 ```
-+c  -c  ?c
-+e  -e  ?e
-+r  -r  ?re
-+n  -n
-+t  -t
-+s  -s
-+m  -m  ?m
-+u  -u  ?u
-+o  -o  ?o
-+r  -r
++c   -c   ?c
++e   -e   ?e
++re  -re  ?re
++n   -n
++t   -t
++s   -s
++m   -m   ?m
++u   -u   ?u
++o   -o   ?o
++r   -r
 ```
 
 ## effectbits suffixes

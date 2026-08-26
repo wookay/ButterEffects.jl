@@ -1,3 +1,12 @@
+```@contents
+Pages = ["essentials.md"]
+Depth = 2:2
+```
+
+```@index
+Pages = ["essentials.md"]
+```
+
 ```@docs
 Base.@_total_meta
 Base.@_terminates_globally_meta

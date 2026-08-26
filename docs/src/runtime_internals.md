@@ -1,3 +1,12 @@
+```@contents
+Pages = ["runtime_internals.md"]
+Depth = 2:2
+```
+
+```@index
+Pages = ["runtime_internals.md"]
+```
+
 ```@docs
 Base.is_some_binding_imported
 Base.is_defined_const_binding

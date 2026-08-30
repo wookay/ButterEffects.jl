@@ -1,3 +1,7 @@
+!!! note
+    doc from
+    - julia/base/runtime_internals.jl
+
 ```@contents
 Pages = ["runtime_internals.md"]
 Depth = 2:2

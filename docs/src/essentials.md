@@ -1,3 +1,9 @@
+!!! note
+    doc from
+    - julia/base/essentials.jl
+    - julia/base/expr.jl
+    - julia/Compiler/src/effects.jl
+
 ```@contents
 Pages = ["essentials.md"]
 Depth = 2:2

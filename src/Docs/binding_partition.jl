@@ -119,6 +119,7 @@ function print_partition_kind(io::IO, kind::UInt8)
     # end
     # print(io, " - ")
     # kind = binding_kind(partition)
+    print(io, "  ")
     if kind == PARTITION_KIND_BACKDATED_CONST
         print(io, "backdated constant binding to ")
         printstyled(io, "partition restriction", underline = true)
@@ -163,6 +164,8 @@ function print_partition_kind(io::IO, kind::UInt8)
     end
 end
 
+# from julia/src/julia.h
+# enum jl_partition_kind {
 function show_partition_kind(io::IO, mime::MIME"text/plain", kind::UInt8)
     doc = if kind == PARTITION_KIND_CONST # 0x0
         """
@@ -224,7 +227,38 @@ function show_partition_kind(io::IO, mime::MIME"text/plain", kind::UInt8)
     # PARTITION_FAKE_KIND_CYCLE # 0xd
 
     doc_from = "-- doc from julia/src/julia.h"
-    md = Markdown.MD(Any[Markdown.parse(doc, flavor=:common), Markdown.parse(doc_from)])
+    md = Markdown.MD(Any[Markdown.Paragraph(doc), Markdown.parse(doc_from)])
+    Base.show(io, mime, md)
+end
+
+# from julia/src/julia.h
+function show_partition_flag(io::IO, mime::MIME"text/plain", flag::UInt16)
+    doc = if flag == PARTITION_FLAG_EXPORTED # 0x10
+        """
+// _EXPORTED: This binding partition is exported. In the world ranges covered by this partitions,
+// other modules that `using` this module, may implicit import this binding."""
+    elseif flag == PARTITION_FLAG_DEPRECATED # 0x20
+        """
+// _DEPRECATED: This binding partition is deprecated. It is considered weak for the purposes of
+// implicit import resolution."""
+    elseif flag == PARTITION_FLAG_DEPWARN # 0x40
+        """
+// _DEPWARN: This binding partition will print a deprecation warning on access. Note that _DEPWARN
+// implies _DEPRECATED. However, the reverse is not true. Such bindings are usually used for functions,
+// where calling the function itself will provide a (better) deprecation warning/error."""
+    elseif flag == PARTITION_FLAG_IMPLICITLY_EXPORTED # 0x80
+        """
+// _IMPLICITLY_EXPORTED: This binding partition is implicitly exported via @reexport. Unlike _EXPORTED,
+// this flag is set during implicit resolution and can be removed if the resolution changes."""
+    elseif flag == PARTITION_FLAG_IMPLICITLY_DEPRECATED # 0x100
+        """
+// _IMPLICITLY_DEPRECATED: The _DEPRECATED/_DEPWARN flags on this partition were set by
+// implicit resolution from the imported binding, rather than set explicitly on this binding.
+// Like _IMPLICITLY_EXPORTED, it is recomputed on re-resolution, and it does not survive
+// replacement of the partition by a definition or an explicit import."""
+    end
+    doc_from = "-- doc from julia/src/julia.h"
+    md = Markdown.MD(Any[Markdown.Paragraph(doc), Markdown.parse(doc_from)])
     Base.show(io, mime, md)
 end
 
@@ -259,6 +293,8 @@ function Base.show(io::IO, mime::MIME"text/plain", part::PartitionFlag)
         end
         println(io)
     end
+    println(io)
+    show_partition_flag(io, mime, part.flag)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", part::PartitionMask)

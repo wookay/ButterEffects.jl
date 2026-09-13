@@ -396,7 +396,7 @@ end # function contents_for_effectsetting
 
 function show_effectsetting(io::IO, mime::MIME"text/plain", setting::Symbol)
     content = contents_for_effectsetting(setting)
-    Base.show(io, mime, Markdown.MD(content))
+    Base.show(io, mime, Markdown.parse(content))
 end # function show_effectsetting
 
 # doc from julia/Compiler/src/effects.jl

@@ -1,6 +1,6 @@
 # module ButterEffects.Docs
 
-# from julia/base/runtime_internals.jl
+# docs for julia/base/runtime_internals.jl
 
 """
 ```julia

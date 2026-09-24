@@ -1,5 +1,6 @@
 using Documenter
 using ButterEffects
+using Core: Compiler
 
 makedocs(
     build = joinpath(@__DIR__, "local" in ARGS ? "build_local" : "build"),

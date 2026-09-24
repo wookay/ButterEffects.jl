@@ -505,4 +505,168 @@ function show_effectbits_letter(io::IO, mime::MIME"text/plain", letter::EffectBi
     show_effectbits_suffix(io, mime, letter.suffix)
 end # function show_effectbits_letter
 
+
+# docs for julia/Compiler/src/effects.jl
+using Core: Compiler as CC
+using .CC: Effects
+"""
+```julia
+effects.consistent === ALWAYS_TRUE
+```
+"""
+CC.is_consistent(effects::Effects)
+
+"""
+```julia
+effects.effect_free === ALWAYS_TRUE
+```
+"""
+CC.is_effect_free(effects::Effects)
+
+"""
+```julia
+effects.nothrow
+```
+"""
+CC.is_nothrow(effects::Effects)
+
+"""
+```julia
+effects.terminates
+```
+"""
+CC.is_terminates(effects::Effects)
+
+"""
+```julia
+effects.notaskstate
+```
+"""
+CC.is_notaskstate(effects::Effects)
+
+"""
+```julia
+effects.inaccessiblememonly === ALWAYS_TRUE
+```
+"""
+CC.is_inaccessiblememonly(effects::Effects)
+
+"""
+```julia
+effects.noub === ALWAYS_TRUE
+```
+"""
+CC.is_noub(effects::Effects)
+
+"""
+```julia
+effects.noub === NOUB_IF_NOINBOUNDS
+```
+"""
+CC.is_noub_if_noinbounds(effects::Effects)
+
+"""
+```julia
+effects.nonoverlayed === ALWAYS_TRUE
+```
+"""
+CC.is_nonoverlayed(effects::Effects)
+
+"""
+```julia
+effects.nortcall
+```
+"""
+CC.is_nortcall(effects::Effects)
+
+"""
+```julia
+# implies `is_notaskstate` & `is_inaccessiblememonly`, but not explicitly checked here
+    is_consistent(effects) &&
+    (is_noub(effects) || is_noub_if_noinbounds(effects)) &&
+    is_effect_free(effects) &&
+    is_terminates(effects) &&
+    (!check_rtcall || is_nortcall(effects))
+```
+"""
+CC.is_foldable(effects::Effects, check_rtcall::Bool=false)
+
+"""
+```julia
+    is_foldable(effects, check_rtcall) &&
+    is_nothrow(effects)
+```
+"""
+CC.is_foldable_nothrow(effects::Effects, check_rtcall::Bool=false)
+
+"""
+```julia
+# TODO add `is_noub` here?
+    is_effect_free(effects) &&
+    is_terminates(effects) &&
+    is_nothrow(effects)
+```
+"""
+CC.is_removable_if_unused(effects::Effects)
+
+"""
+```julia
+    is_nothrow(effects) &&
+    is_notaskstate(effects)
+```
+"""
+CC.is_finalizer_inlineable(effects::Effects)
+
+"""
+```julia
+!iszero(effects.consistent & CONSISTENT_IF_NOTRETURNED)
+```
+"""
+CC.is_consistent_if_notreturned(effects::Effects)
+
+"""
+```julia
+!iszero(effects.consistent & CONSISTENT_IF_INACCESSIBLEMEMONLY)
+```
+"""
+CC.is_consistent_if_inaccessiblememonly(effects::Effects)
+
+"""
+```julia
+!iszero(effects.effect_free & EFFECT_FREE_IF_INACCESSIBLEMEMONLY)
+```
+"""
+CC.is_effect_free_if_inaccessiblememonly(effects::Effects)
+
+"""
+```julia
+effects.inaccessiblememonly === INACCESSIBLEMEM_OR_ARGMEMONLY
+```
+"""
+CC.is_inaccessiblemem_or_argmemonly(effects::Effects)
+
+"""
+```julia
+effects.nonoverlayed === CONSISTENT_OVERLAY
+```
+"""
+CC.is_consistent_overlay(effects::Effects)
+
+
+if VERSION >= v"1.14.0-DEV.2872"
+"""
+```julia
+effects.reset_safe === ALWAYS_TRUE
+```
+"""
+CC.is_reset_safe
+
+"""
+```julia
+!iszero(effects.reset_safe & RESET_SAFE_IF_INACCESSIBLEMEMONLY)
+```
+"""
+CC.is_reset_safe_if_inaccessiblememonly
+end # if
+
 # module ButterEffects.Docs

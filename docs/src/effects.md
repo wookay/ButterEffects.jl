@@ -1,5 +1,9 @@
 # Effects
 
+!!! note
+    doc from
+    - julia/Compiler/src/effects.jl
+
 ```julia-repl
 julia> using ButterEffects
 
@@ -56,4 +60,33 @@ RESET_SAFE_IF_INACCESSIBLEMEMONLY
 INACCESSIBLEMEM_OR_ARGMEMONLY
 NOUB_IF_NOINBOUNDS
 CONSISTENT_OVERLAY
+```
+
+## effects functions
+```@docs
+Compiler.is_consistent
+Compiler.is_nothrow
+Compiler.is_foldable_nothrow
+Compiler.is_effect_free
+Compiler.is_consistent_if_inaccessiblememonly
+Compiler.is_effect_free_if_inaccessiblememonly
+Compiler.is_notaskstate
+Compiler.is_noub
+Compiler.is_finalizer_inlineable
+Compiler.is_inaccessiblememonly
+Compiler.is_nortcall
+Compiler.is_foldable
+Compiler.is_terminates
+Compiler.is_inaccessiblemem_or_argmemonly
+Compiler.is_consistent_if_notreturned
+Compiler.is_removable_if_unused
+Compiler.is_consistent_overlay
+Compiler.is_noub_if_noinbounds
+Compiler.is_nonoverlayed
+```
+
+```@docs
+# if VERSION >= v"1.14.0-DEV.2872"
+# Compiler.is_reset_safe
+# Compiler.is_reset_safe_if_inaccessiblememonly
 ```

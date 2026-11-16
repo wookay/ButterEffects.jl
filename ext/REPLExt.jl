@@ -2,6 +2,16 @@ module REPLExt
 
 using ButterEffects: Docs
 
+function show_effectsetting_and_suffix(io::IO, mime, setting::Symbol)
+    for (suffix, v) in Docs.effectbits_suffix_consts
+        if v === setting
+            Docs.show_effectbits_suffix(io, mime, suffix)
+            return
+        end
+    end
+    Docs.show_effectsetting(io, mime, setting)
+end
+
 function repl_effectbits(io::IO, line::AbstractString)::Bool
     mime = MIME("text/plain")
     if line ∈ Docs.effectbits_letters
@@ -15,13 +25,13 @@ function repl_effectbits(io::IO, line::AbstractString)::Bool
     elseif startswith(line, ':')
         setting = Symbol(line[2:end])
         if setting ∈ Docs.effectsettings
-            Docs.show_effectsetting(io, mime, setting)
+            show_effectsetting_and_suffix(io, mime, setting)
             return true
         end
     else
         setting = Symbol(line)
         if setting ∈ Docs.effectsettings
-            Docs.show_effectsetting(io, mime, setting)
+            show_effectsetting_and_suffix(io, mime, setting)
             return true
         elseif haskey(Docs.effectbits_const_to_suffix, line)
             suffix = getindex(Docs.effectbits_const_to_suffix, line)

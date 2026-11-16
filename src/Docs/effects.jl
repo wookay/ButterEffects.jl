@@ -8,6 +8,7 @@ const effectsettings = [
     :effect_free,
     :reset_safe,
     :nothrow,
+    :terminates,
     :terminates_globally,
     :terminates_locally,
     :notaskstate,
@@ -386,18 +387,24 @@ the following other `setting`s:
     assertions required for a particular application. In cases where a large
     number of effect overrides apply to a set of functions, a custom macro is
     recommended over the use of `:total`."""
-    end
-    if setting ∈ _setting_doc_from_struct_effects
-        doc_from = "-- doc from julia/Compiler/src/effects.jl    `struct Effects`"
     else
-        doc_from = "-- doc from julia/base/expr.jl    `macro assume_effects(args...)`"
+        nothing
     end
-    string(doc, doc_from)
+    if doc === nothing
+        nothing
+    else
+        if setting ∈ _setting_doc_from_struct_effects
+            doc_from = "-- doc from julia/Compiler/src/effects.jl    `struct Effects`"
+        else
+            doc_from = "-- doc from julia/base/expr.jl    `macro assume_effects(args...)`"
+        end
+        string(doc, "\n", doc_from)
+    end
 end # function contents_for_effectsetting
 
 function show_effectsetting(io::IO, mime::MIME"text/plain", setting::Symbol)
     content = contents_for_effectsetting(setting)
-    Base.show(io, mime, Markdown.parse(content))
+    content !== nothing && Base.show(io, mime, Markdown.parse(content))
 end # function show_effectsetting
 
 # doc from julia/Compiler/src/effects.jl

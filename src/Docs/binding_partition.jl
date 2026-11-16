@@ -263,23 +263,25 @@ function show_partition_flag(io::IO, mime::MIME"text/plain", flag::UInt16)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", part::PartitionKind)
+    ioc = IOContext(io, :color => true)
     for (idx, kind) in enumerate(PARTITION_KIND_CONST:PARTITION_KIND_BACKDATED_CONST)
         kind_sym = partition_kinds[idx]
         if kind == part.kind
-            printstyled(io, "const ", kind_sym, " = ", repr(kind); color = :cyan)
+            printstyled(ioc, "const ", kind_sym, " = ", repr(kind); color = :cyan)
         else
-            print(io,       "const ", kind_sym, " = ", repr(kind))
+            print(ioc,       "const ", kind_sym, " = ", repr(kind))
         end
-        println(io)
+        println(ioc)
     end
-    println(io)
-    print_partition_kind(io, part.kind)
-    println(io)
-    println(io)
-    show_partition_kind(io, mime, part.kind)
+    println(ioc)
+    print_partition_kind(ioc, part.kind)
+    println(ioc)
+    println(ioc)
+    show_partition_kind(ioc, mime, part.kind)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", part::PartitionFlag)
+    ioc = IOContext(io, :color => true)
     for (idx, flag) in enumerate([PARTITION_FLAG_EXPORTED,
                                   PARTITION_FLAG_DEPRECATED,
                                   PARTITION_FLAG_DEPWARN,
@@ -287,26 +289,27 @@ function Base.show(io::IO, mime::MIME"text/plain", part::PartitionFlag)
                                   PARTITION_FLAG_IMPLICITLY_DEPRECATED])
         flag_sym = partition_flags[idx]
         if flag == part.flag
-            printstyled(io, "const ", flag_sym, " = ", repr(flag); color = :cyan)
+            printstyled(ioc, "const ", flag_sym, " = ", repr(flag); color = :cyan)
         else
-            print(io,       "const ", flag_sym, " = ", repr(flag))
+            print(ioc,       "const ", flag_sym, " = ", repr(flag))
         end
-        println(io)
+        println(ioc)
     end
-    println(io)
-    show_partition_flag(io, mime, part.flag)
+    println(ioc)
+    show_partition_flag(ioc, mime, part.flag)
 end
 
 function Base.show(io::IO, mime::MIME"text/plain", part::PartitionMask)
+    ioc = IOContext(io, :color => true)
     for (idx, mask) in enumerate([PARTITION_MASK_KIND,
                                   PARTITION_MASK_FLAG])
         mask_sym = partition_masks[idx]
         if mask == part.mask
-            printstyled(io, "const ", mask_sym, " = ", repr(mask); color = :cyan)
+            printstyled(ioc, "const ", mask_sym, " = ", repr(mask); color = :cyan)
         else
-            print(io,       "const ", mask_sym, " = ", repr(mask))
+            print(ioc,       "const ", mask_sym, " = ", repr(mask))
         end
-        println(io)
+        println(ioc)
     end
 end
 

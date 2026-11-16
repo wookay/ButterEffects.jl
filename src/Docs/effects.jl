@@ -93,7 +93,8 @@ end
 
 function Base.show(io::IO, mime::MIME"text/plain", letter::EffectBitsLetter)
     color = effectbitsletter_color(letter)
-    printstyled(io, string(letter.prefix, letter.suffix); color)
+    ioc = IOContext(io, :color => true)
+    printstyled(ioc, string(letter.prefix, letter.suffix); color)
 end
 
 
@@ -453,14 +454,16 @@ function show_effectbits_suffix(io::IO, mime::MIME"text/plain", suffix::Union{Ch
   in the future."""
     elseif suffix == 'm'
         """
-- `inaccessiblememonly::UInt8`:
-  * `ALWAYS_TRUE`: this method does not access or modify externally accessible mutable memory.
-    This state corresponds to LLVM's `inaccessiblememonly` function attribute.
-  * `ALWAYS_FALSE`: this method may access or modify externally accessible mutable memory.
-  * `INACCESSIBLEMEM_OR_ARGMEMONLY`: this method does not access or modify externally accessible mutable memory,
-    except that it may access or modify mutable memory pointed to by its call arguments.
-    This may later be refined to `ALWAYS_TRUE` in a case when call arguments are known to be immutable.
-    This state corresponds to LLVM's `inaccessiblemem_or_argmemonly` function attribute."""
+- `inaccessiblememonly::UInt8`: which mutable memory this method can reach, either by accessing it
+  or by obtaining a reference to it (e.g. loading a constant binding or a literal in the code, while
+  the result of concrete evaluation keeps the taint of the call). Unlike the LLVM attributes of the
+  same names, a reference that is obtained but not accessed still counts, since the refinement below
+  only looks at argument types.
+  * `ALWAYS_TRUE`: this method reaches no externally accessible mutable memory.
+  * `ALWAYS_FALSE`: this method may reach externally accessible mutable memory.
+  * `INACCESSIBLEMEM_OR_ARGMEMONLY`: this method reaches no externally accessible mutable memory,
+    except for mutable memory pointed to by its call arguments.
+    This may later be refined to `ALWAYS_TRUE` in a case when call arguments are known to be immutable."""
     elseif suffix == 'u'
         """
 - `noub::UInt8`:
